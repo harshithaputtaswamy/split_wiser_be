@@ -4,21 +4,25 @@ import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 const auth = getAuth(firebase_app);
 
 
-export default async function signUp(req, params) {
+export default async function signUp(req, res) {
     let result = null,
         error = null;
-        console.log("\n\n", req, "\n\n");
-        let email = req.searchParams.email;
-        let password = req.searchParams.password;
-    try {
-        result = await createUserWithEmailAndPassword(auth, email, password);
-        // result = {
-        //     "value": "hi"
-        // }
-    } catch (e) {
-        error = e;
-        console.log("\n\nError captured at server end: ", e, "\n\n");
-    }
+        console.log(req);
+        if (req.method == 'POST') {
+            console.log("\n\n", req.body, "\n\n");
+            let email = req.body.email;
+            let password = req.body.password;
+            try {
+                result = await createUserWithEmailAndPassword(auth, email, password);
+                // result = {
+                //     "value": "hi"
+                // }
 
-    return { result, error };
+                res.status(201).json(result);
+            } catch (e) {
+                error = e;
+                console.log("\n\nError captured at server end: ", e, "\n\n");
+                res.status(500).json('Error occured at server end');
+            }
+        }
 }
